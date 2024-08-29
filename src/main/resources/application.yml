@@ -1,0 +1,36 @@
+spring:
+  application:
+    name: shop-app
+  servlet:
+    multipart:
+      max-file-size: 10MB
+      max-request-size: 10MB
+  datasource:
+    url: jdbc:mysql://localhost:3306/Clothing
+    username: root
+    password: thin2001
+    driver-class-name: com.mysql.cj.jdbc.Driver
+  jpa:
+    show-sql: true
+    hibernate:
+      ddl-auto: none
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.MySQL8Dialect
+        format_sql: true
+        boot:
+          allow_jdbc_metadata_access: false
+
+server:
+  port: 8080
+
+api:
+  prefix: /api
+
+jwt:
+  expiration: 259200 #30 days = 30 * 24 * 60 * 60
+  expiration-refresh-token: 5184000 #60 days = 60 * 24 * 60 * 60
+  secretKey: TaqlmGv1iEDMRiFp/pHuID1+T84IABfuA0xXh4GhiUI=
+
+schedule:
+  everyday: 59 59 23 * * ?
