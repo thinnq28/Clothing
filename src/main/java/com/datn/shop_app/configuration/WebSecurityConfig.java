@@ -47,9 +47,11 @@ public class WebSecurityConfig {
                                     String.format("%s/commodities/by-name", apiPrefix),
                                     String.format("%s/products/images/**", apiPrefix),
                                     String.format("%s/variants/images/**", apiPrefix),
-                                    String.format("%s/variants/by-ids/**", apiPrefix),
+                                    String.format("%s/variants/by-ids", apiPrefix),
                                     String.format("%s/variants/by-product/**", apiPrefix),
-                                    String.format("%s/vouchers/by-code/**", apiPrefix),
+                                    String.format("%s/products/details/**", apiPrefix),
+                                    String.format("%s/vouchers/by-code", apiPrefix),
+                                    String.format("%s/orders", apiPrefix),
                                     String.format("%s/products/**", apiPrefix))
                             .permitAll()
                             .anyRequest().authenticated();

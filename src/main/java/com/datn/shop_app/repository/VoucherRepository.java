@@ -35,4 +35,9 @@ public interface VoucherRepository extends JpaRepository<Voucher, Integer> {
                                           @Param("active") Boolean active);
 
     Voucher getVoucherByCodeAndActive(String code, Boolean active);
+
+    @Query("SELECT v FROM Voucher v WHERE " +
+            " (:codes IS NULL OR v.code IN :codes)" +
+            "AND v.active = true")
+    List<Voucher> getVouchersByCode(@Param("codes") List<String> codes);
 }

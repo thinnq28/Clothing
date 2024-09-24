@@ -67,7 +67,7 @@ public class VoucherController {
 
         try {
             List<String> errors = voucherService.validate(voucherDTO, bindingResult, true);
-            if(!errors.isEmpty()){
+            if (!errors.isEmpty()) {
                 return ResponseEntity.badRequest().body(ResponseObject.builder()
                         .message("Create voucher is not successful")
                         .status(HttpStatus.BAD_REQUEST)
@@ -80,7 +80,7 @@ public class VoucherController {
                     .status(HttpStatus.OK)
                     .data(VoucherResponse.fromVoucher(voucher))
                     .build());
-        }catch (Exception e){
+        } catch (Exception e) {
             return ResponseEntity.badRequest().body(ResponseObject.builder()
                     .message("Create voucher is not successful")
                     .status(HttpStatus.BAD_REQUEST)
@@ -91,10 +91,10 @@ public class VoucherController {
     @PutMapping("/{id}")
     @PreAuthorize("hasRole('ROLE_ADMIN') or hasRole('ROLE_UPDATE')")
     public ResponseEntity<ResponseObject> updateVoucher(@PathVariable Integer id,
-            @Valid @RequestBody VoucherDTO voucherDTO, BindingResult bindingResult) {
+                                                        @Valid @RequestBody VoucherDTO voucherDTO, BindingResult bindingResult) {
         try {
             Voucher voucher = voucherService.getVoucher(id);
-            if(voucher == null){
+            if (voucher == null) {
                 return ResponseEntity.badRequest().body(ResponseObject.builder()
                         .message("Voucher is not found")
                         .status(HttpStatus.BAD_REQUEST)
@@ -102,7 +102,7 @@ public class VoucherController {
             }
 
             List<String> errors = voucherService.validate(voucherDTO, bindingResult, false);
-            if(!errors.isEmpty()){
+            if (!errors.isEmpty()) {
                 return ResponseEntity.badRequest().body(ResponseObject.builder()
                         .message("Update voucher is not successful")
                         .status(HttpStatus.BAD_REQUEST)
@@ -111,7 +111,7 @@ public class VoucherController {
 
             voucher = voucherService.update(id, voucherDTO);
 
-            if(voucher == null){
+            if (voucher == null) {
                 return ResponseEntity.badRequest().body(ResponseObject.builder()
                         .message("Update voucher is not successful")
                         .status(HttpStatus.BAD_REQUEST)
@@ -123,7 +123,7 @@ public class VoucherController {
                     .status(HttpStatus.OK)
                     .data(VoucherResponse.fromVoucher(voucher))
                     .build());
-        }catch (Exception e){
+        } catch (Exception e) {
             return ResponseEntity.badRequest().body(ResponseObject.builder()
                     .message("Update voucher is not successful")
                     .status(HttpStatus.BAD_REQUEST)
@@ -136,7 +136,7 @@ public class VoucherController {
     public ResponseEntity<ResponseObject> getVoucherDetail(@PathVariable Integer id) {
         Voucher voucher = voucherService.getVoucher(id);
 
-        if(voucher == null) {
+        if (voucher == null) {
             return ResponseEntity.ok().body(ResponseObject.builder()
                     .message("Voucher is not exist")
                     .status(HttpStatus.NOT_FOUND)
@@ -170,7 +170,7 @@ public class VoucherController {
     public ResponseEntity<ResponseObject> getVoucherByVoucherCode(@RequestParam String code,
                                                                   @RequestParam Integer userId) {
         List<String> errors = new ArrayList<>();
-        if(code == null || code.isEmpty()){
+        if (code == null || code.isEmpty()) {
             return ResponseEntity.badRequest().body(ResponseObject.builder()
                     .message("Voucher code is required")
                     .status(HttpStatus.BAD_REQUEST)
@@ -179,30 +179,30 @@ public class VoucherController {
 
         Voucher voucher = voucherService.getVoucherByCode(code);
 
-        if(voucher == null) {
+        if (voucher == null) {
             return ResponseEntity.badRequest().body(ResponseObject.builder()
                     .message("Voucher is not exist")
                     .status(HttpStatus.BAD_REQUEST)
-                            .data(errors)
+                    .data(errors)
                     .build());
         }
 
-        if(LocalDate.now().isBefore(voucher.getStartDate())){
+        if (LocalDate.now().isBefore(voucher.getStartDate())) {
             errors.add("Voucher has not been applied yet");
         }
 
-        if(LocalDate.now().isAfter(voucher.getEndDate())){
+        if (LocalDate.now().isAfter(voucher.getEndDate())) {
             errors.add("Voucher is expired");
         }
 
 
-        if(voucher.getMaxUsage() != null && voucher.getTimesUsed() > voucher.getMaxUsage()){
+        if (voucher.getMaxUsage() != null && voucher.getTimesUsed() >= voucher.getMaxUsage()) {
             errors.add("Voucher run out of applications");
         }
 
-        if(userId != null && userId > 0){
+        if (userId != null && userId > 0) {
             Optional<User> user = userRepository.findByIdAndActive(userId, true);
-            if(user.isPresent()){
+            if (user.isPresent()) {
                 List<Order> orders = orderRepository.findByUserId(userId);
                 double total = 0.0;
                 for (Order order : orders) {
@@ -211,18 +211,18 @@ public class VoucherController {
                 BigDecimal doubleAsBigDecimal = BigDecimal.valueOf(total);
 
                 int comparisonResult = doubleAsBigDecimal.compareTo(voucher.getMinPurchaseAmount());
-                if(comparisonResult < 0){
+                if (comparisonResult < 0) {
                     errors.add("You have not reached the voucher's minimum spend requirement");
                 }
             }
         }
 
-        if(!errors.isEmpty()){
-            ResponseEntity.badRequest().body(ResponseObject.builder()
+        if (!errors.isEmpty()) {
+            return ResponseEntity.badRequest().body(ResponseObject.builder()
                     .message("Get Voucher is not successful")
                     .status(HttpStatus.BAD_REQUEST)
                     .data(errors)
-                    .data(VoucherResponse.fromVoucher(voucher)).build());
+                    .build());
         }
 
         return ResponseEntity.ok().body(ResponseObject.builder()

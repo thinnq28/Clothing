@@ -42,6 +42,8 @@ public class VoucherResponse {
 
     private Boolean active;
 
+    private String html;
+
     public static VoucherResponse fromVoucher(Voucher voucher) {
         VoucherResponse response = new VoucherResponse();
         BeanUtils.copyProperties(voucher, response);

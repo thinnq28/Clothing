@@ -1,0 +1,1 @@
+ALTER TABLE commodities MODIFY commidity_name VARCHAR(50) UNIQUE;

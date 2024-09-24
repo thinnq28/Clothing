@@ -1,12 +1,14 @@
 package com.datn.shop_app.DTO;
 
 import com.datn.shop_app.entity.User;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
 import lombok.*;
 
+import java.math.BigDecimal;
 import java.util.List;
 
 
@@ -29,7 +31,6 @@ public class OrderDTO {
     private String phoneNumber;
 
     @Size(max = 100, message = "Max length of email is 100 characters")
-    @Pattern(regexp = "^\\w+([-+.']\\w+)*@\\w+([-.]\\w+)*\\.\\w+([-.]\\w+)*$", message = "{Pattern.user.email}")
     private String email;
 
     @Size(max = 255, message = "Max length of address is 255 characters")
@@ -46,5 +47,12 @@ public class OrderDTO {
     @NotBlank(message = "Status cannot be blank")
     private String status;
 
+
+    private List<String> codes;
+
+    @JsonProperty("totalMoney")
+    private BigDecimal total;
+
+    @JsonProperty("cart_items")
     private List<CartItemDTO> cartItems;
 }

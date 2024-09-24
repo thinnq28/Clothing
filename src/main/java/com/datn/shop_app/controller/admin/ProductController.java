@@ -6,6 +6,7 @@ import com.datn.shop_app.repository.ProductRepository;
 import com.datn.shop_app.response.ResponseObject;
 import com.datn.shop_app.response.product.ListProductResponse;
 import com.datn.shop_app.response.product.ProductResponse;
+import com.datn.shop_app.service.ProductRedisService;
 import com.datn.shop_app.service.ProductService;
 import com.datn.shop_app.utils.FileUtils;
 import jakarta.validation.Valid;
@@ -14,6 +15,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.UrlResource;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -30,6 +32,8 @@ import java.util.List;
 @RequiredArgsConstructor
 public class ProductController {
     private final ProductService productService;
+
+    private final ProductRedisService productRedisService;
 
     @Autowired
     private final ProductRepository productRepository;
@@ -109,13 +113,26 @@ public class ProductController {
             @RequestParam(value = "limit", required = false, defaultValue = "10") int limit) {
         try {
             int totalPages = 0;
-            PageRequest pageRequest = PageRequest.of(page, limit);
-            Page<ProductResponse> productPage = productService.getProducts(name, supplierName, commodityName, active, pageRequest);
-            totalPages = productPage.getTotalPages();
-            List<ProductResponse> productResponses = productPage.getContent();
+            PageRequest pageRequest = PageRequest.of(
+                    page, limit,
+                    //Sort.by("createdAt").descending()
+                    Sort.by("id").ascending()
+            );
 
-            for (ProductResponse productResponse : productResponses) {
-                productResponse.setTotalPages(totalPages);
+            List<ProductResponse> productResponses = productRedisService.getProducts(name, supplierName, commodityName, active, pageRequest);
+
+            if (productResponses != null && !productResponses.isEmpty()) {
+                totalPages = productResponses.get(0).getTotalPages();
+            } else {
+                Page<ProductResponse> productPage = productService.getProducts(name, supplierName, commodityName, active, pageRequest);
+                totalPages = productPage.getTotalPages();
+                productResponses = productPage.getContent();
+
+                for (ProductResponse productResponse : productResponses) {
+                    productResponse.setTotalPages(totalPages);
+                }
+
+                productRedisService.saveProducts(productResponses, name, supplierName, commodityName, active, pageRequest);
             }
 
             ListProductResponse listProductValueResponse = ListProductResponse.builder()
@@ -222,7 +239,6 @@ public class ProductController {
     }
 
     @GetMapping("/details/{id}")
-    @PreAuthorize("hasRole('ROLE_ADMIN') or hasRole('ROLE_READ') or hasRole('USER')")
     public ResponseEntity<ResponseObject> getProduct(@PathVariable Integer id) {
         try {
             Product product = productService.getProductById(id);

@@ -18,5 +18,7 @@ public interface OrderService {
 
     Order getOrderById(Integer id);
 
+    Order createOrder(OrderDTO orderDTO);
+
     List<String> validOrder(OrderDTO orderDTO, BindingResult bindingResult);
 }

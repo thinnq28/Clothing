@@ -19,8 +19,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
-import java.util.Arrays;
-import java.util.List;
+import java.util.*;
 
 @Component
 @RequiredArgsConstructor
@@ -81,10 +80,12 @@ public class JwtTokenFilter extends OncePerRequestFilter {
                 Pair.of(String.format("%s/products/images/**", apiPrefix), "GET"),
                 Pair.of(String.format("%s/variants/images/**", apiPrefix), "GET"),
                 Pair.of(String.format("%s/variants/by-product/**", apiPrefix), "GET"),
-                Pair.of(String.format("%s/variants/by-ids/**", apiPrefix), "GET"),
+                Pair.of(String.format("%s/variants/by-ids", apiPrefix), "GET"),
                 Pair.of(String.format("%s/products", apiPrefix), "GET"),
                 Pair.of(String.format("%s/commodities/by-name", apiPrefix), "GET"),
-                Pair.of(String.format("%s/vouchers/by-code/**", apiPrefix), "GET")
+                Pair.of(String.format("%s/vouchers/by-code", apiPrefix), "GET"),
+                Pair.of(String.format("%s/orders", apiPrefix), "POST"),
+                Pair.of(String.format("%s/products/details/**", apiPrefix), "GET")
         );
 
         String requestPath = request.getServletPath();

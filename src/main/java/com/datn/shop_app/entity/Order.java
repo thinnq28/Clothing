@@ -8,6 +8,7 @@ import jakarta.validation.constraints.Size;
 import lombok.*;
 import org.hibernate.annotations.ColumnDefault;
 
+import java.math.BigDecimal;
 import java.time.Instant;
 import java.time.LocalDate;
 import java.util.LinkedHashSet;
@@ -76,5 +77,8 @@ public class Order {
     @OneToMany(mappedBy = "order")
     @JsonManagedReference
     private List<VoucherOrder> voucherOrders;
+
+    @Column(name = "total", precision = 15, scale = 2)
+    private BigDecimal total;
 
 }

@@ -2,6 +2,7 @@ package com.datn.shop_app.controller.admin;
 
 import com.datn.shop_app.DTO.CommodityDTO;
 import com.datn.shop_app.DTO.SupplierDTO;
+import com.datn.shop_app.component.converter.CommodityMessageConverter;
 import com.datn.shop_app.entity.Commodity;
 import com.datn.shop_app.entity.Supplier;
 import com.datn.shop_app.response.ResponseObject;
@@ -17,6 +18,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.FieldError;
@@ -31,6 +33,7 @@ import java.util.List;
 @RequiredArgsConstructor
 public class CommodityController {
     private final CommodityService commodityService;
+    private final KafkaTemplate<String, Object> kafkaTemplate;
 
     @PostMapping
     @PreAuthorize("hasRole('ROLE_ADMIN') or hasRole('ROLE_CREATE')")

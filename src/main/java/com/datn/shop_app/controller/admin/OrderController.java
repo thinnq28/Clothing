@@ -107,10 +107,25 @@ public class OrderController {
                 .data(orderResponse)
                 .message("Update status for order is successful").build());
     }
-//
-//    @PostMapping
-//    public ResponseEntity<ResponseObject> createOrder(@Valid @RequestBody OrderDTO orderDTO, BindingResult bindingResult){
-//
-//    }
+
+    @PostMapping
+    public ResponseEntity<ResponseObject> createOrder(@Valid @RequestBody OrderDTO orderDTO, BindingResult bindingResult){
+        List<String> errors = orderService.validOrder(orderDTO, bindingResult);
+        if (!errors.isEmpty()) {
+            return ResponseEntity.badRequest().body(ResponseObject.builder()
+                    .message("Create order is not successful")
+                    .status(HttpStatus.BAD_REQUEST)
+                    .data(errors)
+                    .build());
+        }
+
+        Order order = orderService.createOrder(orderDTO);
+
+        return ResponseEntity.ok().body(ResponseObject.builder()
+                .message("Create order is successful")
+                .status(HttpStatus.OK   )
+                .data(OrderResponse.fromOrder(order))
+                .build());
+    }
 
 }
